@@ -4,8 +4,8 @@ Plugin for ImpactJS to read Tiled (http://mapeditor.org) map files.
 
 ## Dependencies
 
-- underscore
-- impact-layers
+- underscore http://underscorejs.org/
+- impact-layers https://github.com/amadeus/impact-layers
 
 ## Notes
 
@@ -16,6 +16,13 @@ For example, media/maps/test.json and media/maps/tilesets/ground.png.
 
 ## TODO
 
-- example usage
 - base entity types that use the tiled entities
 - image layers
+- docs
+
+## Credits
+
+Assets used in the example:
+- font: included with Impact
+- Village, Forest, Collision, and Xam are from LostDecadeGames https://github.com/lostdecade/onslaught2_impact
+- Tiles_12 is by Buch http://opengameart.org/users/buch
