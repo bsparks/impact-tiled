@@ -4,8 +4,8 @@ ig.module('plugins.tiled.tileset')
 
         ig.Tiled = ig.Tiled || {};
 
-        // TODO: something better here (config?)
-        var MEDIA_PATH = '/media/maps/';
+        // override this prefix based on where you save your map exports
+        ig.Tiled.MEDIA_PATH = '/media/';
 
         ig.Tiled.Tileset = ig.Class.extend({
             firstgid: 1,
@@ -32,7 +32,7 @@ ig.module('plugins.tiled.tileset')
 
             setImage: function(path) {
                 this.image = path;
-                this._image = new ig.Image(MEDIA_PATH + path);
+                this._image = new ig.Image(ig.Tiled.MEDIA_PATH + path);
             },
 
             // draw actual image tile based on firstgid indexing

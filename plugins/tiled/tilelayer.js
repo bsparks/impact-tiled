@@ -60,6 +60,8 @@ ig.module('plugins.tiled.tilelayer')
             },
 
             draw: function() {
+                this.setScreenPos(ig.game.screen.x, ig.game.screen.y);
+
                 if (!this.visible || !this._map || !this._map.allTilesetsLoaded()) {
                     return;
                 }
