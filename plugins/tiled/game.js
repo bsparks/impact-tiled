@@ -37,7 +37,18 @@ ig.module('plugins.tiled.game')
                         });
 
                         _.each(layer.objects, function(entity) {
-                            // for now just spawn to 'entities' TODO: support named (injection)
+                            // use the Tiled name so that it doesn't *need* to be specified in properties of the object
+                            // this name is used during spawnEntity for the hashmap lookup, so it has to be set NOW
+                            if(entity.name && entity.name.length > 0 && !entity.properties.name) {
+                                entity.properties.name = entity.name;
+                            }
+
+                            // since type is also not required in Tiled...
+                            if(!entity.type || entity.type.length === 0) {
+                                // TODO: should just ignore these instead? perhaps also having a valid entity registry to test?
+                                entity.type = ig.Entity;
+                            }
+
                             game.spawnEntity(entity.type, entity.x, entity.y, entity.properties);
                         });
                     }
