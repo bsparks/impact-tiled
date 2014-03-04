@@ -1,11 +1,28 @@
 ig.module('plugins.tiled.game')
-    .requires('impact.game', 'impact.entity', 'plugins.tiled.map', 'plugins.layers')
+    .requires('impact.game', 'impact.entity', 'impact.entity-pool', 'plugins.tiled.map', 'plugins.layers')
     .defines(function() {
 
         ig.Game.inject({
             loadTiledMap: function(mapData) {
                 var game = this,
-                    map = new ig.Tiled.Map(mapData);
+                    map = new ig.Tiled.Map(mapData),
+                    hitEntities = false;
+
+                ig.EntityPool.drainAllPools();
+                game.screen = {
+                    x: 0,
+                    y: 0
+                };
+
+                // Clear out existing stuff
+                _.each(game.layerOrder, function(name) {
+                    var layer = game.layers[name];
+                    if(layer && layer.clearOnLoad) {
+                        layer.items.length = 0;
+                    }
+                });
+
+                game.namedEntities = {};
 
                 game.collisionMap = map.collisionMap;
 
@@ -16,18 +33,20 @@ ig.module('plugins.tiled.game')
                         return;
                     }
 
-                    game.createLayer(layer.name);
-
                     if (layer.type === 'tilelayer') {
                         game.setLayerProperties(layer.name, {
                             mapLayer: true,
                             clearOnLoad: true
                         });
-                        game.addItem(layer, layer.name);
+
+                        game.addItem(layer, hitEntities ? 'foregroundMaps' : 'backgroundMaps');
                     }
 
                     // entity layers
                     if (layer.type === 'objectgroup') {
+                        // TODO: support multiple object layers with varying foregroundness?
+                        hitEntities = true;
+
                         game.setLayerProperties(layer.name, {
                             clearOnLoad: true,
                             entityLayer: true,
@@ -44,7 +63,7 @@ ig.module('plugins.tiled.game')
                             }
 
                             // since type is also not required in Tiled...
-                            if(!entity.type || entity.type.length === 0) {
+                            if (!entity.type || entity.type.length === 0) {
                                 // TODO: should just ignore these instead? perhaps also having a valid entity registry to test?
                                 entity.type = ig.Entity;
                             }
@@ -52,6 +71,18 @@ ig.module('plugins.tiled.game')
                             game.spawnEntity(entity.type, entity.x, entity.y, entity.properties);
                         });
                     }
+
+                    game.sortEntities();
+
+                    _.each(game.layerOrder, function(name) {
+                        var layer = game.layers[name];
+                        if(layer.entityLayer) {
+                            _.each(layer.items, function(item) {
+                                item.ready();
+                            });
+                        }
+                    });
+
                 });
 
                 return map;
